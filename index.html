@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Bet Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <style>
+  :root {
+    --primary: #eaeaf0;
+    --secondary: #141629;
+    --background: radial-gradient(circle at top, #141629 0%, #0b0d1a 60%);
+    --accent: #1dd1a1;
+    --accent-2: #54a0ff;
+    --danger: #ff6b6b;
+    --highlight: #feca57;
+    --card-bg: linear-gradient(160deg, #1b1e3c, #141629);
+    --radius: 16px;
+    --shadow: rgba(0, 0, 0, 0.6);
+    --border: rgba(255,255,255,0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    background: var(--background);
+    color: var(--primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: linear-gradient(90deg, #0f1228, #1b1e3c);
+    padding: 1.4rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 6px 18px var(--shadow);
+  }
+
+  main {
+    flex: 1;
+    padding: 2.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.2rem;
+  }
+
+  .logo {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--accent);
+    text-shadow: 0 0 18px rgba(29,209,161,0.35);
+  }
+
+  .btn {
+    width: 100%;
+    max-width: 340px;
+    padding: 1.1rem 1.5rem;
+    border-radius: var(--radius);
+    font-size: 1.15rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 18px var(--shadow);
+    backdrop-filter: blur(6px);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #10ac84);
+    color: #0b0d1a;
+  }
+
+  .btn-outline {
+    background: rgba(255,255,255,0.04);
+    color: var(--accent);
+    border: 1px solid rgba(29,209,161,0.35);
+  }
+
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px var(--shadow);
+    filter: brightness(1.08);
+  }
+
+  #todayStats {
+    width: 100%;
+    max-width: 640px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 1.8rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px var(--shadow);
+  }
+
+  #todayStats h2 {
+    text-align: center;
+    margin-bottom: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--highlight);
+  }
+
+  #todayStats ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  #todayStats ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-size: 1.05rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  #todayStats ul li:last-child {
+    border-bottom: none;
+  }
+
+  #todayStats .label {
+    color: #aab0ff;
+    font-weight: 600;
+  }
+
+  footer {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #8b8fae;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+</style>
+
+</head>
+<body>
+  <header>
+    Bet Tracker
+  </header>
+
+  <main>
+    <div class="logo">Bet Tracker</div>
+
+    <a href="add.html" class="btn btn-primary">Add Bet</a>
+    <a href="history.html" class="btn btn-outline">Bet History</a>
+    <a href="insights.html" class="btn btn-outline">Insights</a>
+    <a href="calendar.html" class="btn btn-outline">Calendar</a>
+
+    <!-- Today Stats -->
+    <div id="todayStats">
+      <h2>Today's Stats</h2>
+      <ul>
+        <li><span class="label">Total Bets:</span> <span id="todayTotalBets">-</span></li>
+        <li><span class="label">Win Rate:</span> <span id="todaySuccessRate">-</span></li>
+        <li><span class="label">Average Stake per Bet:</span> <span id="todayAvgStake">-</span></li>
+        <li><span class="label">Total Earnings:</span> <span id="todayTotalEarnings">-</span></li>
+        <li><span class="label">Total Money Staked:</span> <span id="todayTotalStaked">-</span></li>
+        <li><span class="label">Total Profit:</span> <span id="todayTotalProfit">-</span></li>
+        <li><span class="label">Won - Lost - Cash Out:</span> <span id="todayWLCO">-</span></li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Bet Tracker
+  </footer>
+
+  <script>
+    let db, bets=[];
+
+    const request = indexedDB.open("BetTrackerDB",1);
+    request.onsuccess = e => { db = e.target.result; loadBets(); }
+    request.onerror = e => console.error("IndexedDB error", e);
+
+    function loadBets(){
+      const tx = db.transaction("bets","readonly");
+      const store = tx.objectStore("bets");
+      store.getAll().onsuccess = e => {
+        bets = e.target.result;
+        updateTodayStats();
+      }
+    }
+
+    function updateTodayStats(){
+      const today = new Date().toDateString();
+      const todayBets = bets.filter(b => new Date(b.date).toDateString() === today);
+
+      const totalBets = todayBets.length;
+      const wonBets = todayBets.filter(b => b.result === 'won').length;
+      const lostBets = todayBets.filter(b => b.result === 'lost').length;
+      const cashoutBets = todayBets.filter(b => b.result === 'cashout').length;
+
+      const totalStake = todayBets.reduce((sum,b) => sum+b.stake,0);
+      const totalEarnings = todayBets.filter(b=>b.result==='won').reduce((sum,b)=>sum+b.stake*b.odds,0);
+      const totalProfit = totalEarnings - totalStake;
+      const avgStake = totalBets ? totalStake/totalBets : 0;
+      const successRate = totalBets ? (wonBets/(totalBets-cashoutBets)*100) : 0;
+
+      document.getElementById('todayTotalBets').textContent = totalBets;
+      document.getElementById('todaySuccessRate').textContent = successRate.toFixed(2) + '%';
+      document.getElementById('todayAvgStake').textContent = avgStake.toFixed(2) + ' €';
+      document.getElementById('todayTotalStaked').textContent = totalStake.toFixed(2) + ' €';
+      document.getElementById('todayTotalEarnings').textContent = totalEarnings.toFixed(2) + ' €';
+
+      const profitEl = document.getElementById('todayTotalProfit');
+      profitEl.textContent = totalProfit.toFixed(2) + ' €';
+      profitEl.style.color = totalProfit>0?'limegreen':totalProfit<0?'red':'#fff';
+
+      document.getElementById('todayWLCO').textContent = `${wonBets} - ${lostBets} - ${cashoutBets}`;
+    }
+  </script>
+</body>
+</html>

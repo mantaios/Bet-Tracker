@@ -1,0 +1,344 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Bet - Bet Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+  --primary: #eaeaf0;
+  --secondary: #141629;
+  --background: radial-gradient(circle at top, #141629 0%, #0b0d1a 65%);
+  --accent: #1dd1a1;
+  --accent-2: #54a0ff;
+  --highlight: #feca57;
+  --card-bg: linear-gradient(160deg, #1b1e3c, #141629);
+  --radius: 16px;
+  --shadow: rgba(0,0,0,0.6);
+  --border: rgba(255,255,255,0.08);
+  --success: #2ecc71;
+  --danger: #ff6b6b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Inter","Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: var(--primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem;
+}
+
+#backButton {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.2rem;
+  padding: 0.65rem 1.1rem;
+  background: linear-gradient(135deg, var(--accent), #10ac84);
+  color: #0b0d1a;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px var(--shadow);
+  z-index: 1000;
+  transition: all 0.25s ease;
+}
+
+#backButton:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+header {
+  width: 100%;
+  text-align: center;
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  text-shadow: 0 0 18px rgba(29,209,161,0.35);
+}
+
+form {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card-bg);
+  padding: 2.2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 34px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+h2 {
+  text-align: center;
+  color: var(--highlight);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #aab0ff;
+  margin-bottom: 0.25rem;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.35);
+  color: var(--primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+input::placeholder {
+  color: #7d83b3;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(29,209,161,0.25);
+}
+
+.btn-submit {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, var(--accent), #10ac84);
+  color: #0b0d1a;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border: none;
+  padding: 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: 0 8px 22px var(--shadow);
+  transition: all 0.25s ease;
+}
+
+.btn-submit:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.08);
+}
+
+#cashOutDiv {
+  display: none;
+}
+
+#message {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  z-index: 2000;
+  display: none;
+}
+
+#message.success {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: #0b0d1a;
+}
+
+#message.error {
+  background: linear-gradient(135deg, #ff6b6b, #ee5253);
+  color: #0b0d1a;
+}
+
+footer {
+  width: 100%;
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8b8fae;
+  border-top: 1px solid var(--border);
+}
+
+#previewImage {
+  max-width: 100%;
+  border-radius: var(--radius);
+  margin-top: 0.6rem;
+  box-shadow: 0 6px 18px var(--shadow);
+}
+
+@media (max-width: 500px) {
+  form {
+    padding: 1.6rem;
+  }
+}
+</style>
+
+</head>
+<body>
+
+<button id="backButton">← Back</button>
+
+<div id="message"></div>
+
+<header>Add Bet</header>
+
+<form id="betForm">
+  <div class="flex-row" style="display:flex; gap:1rem; flex-wrap:wrap;">
+    <div style="flex:1 1 45%;">
+      <label for="stake">Stake (€)</label>
+      <input type="number" id="stake" name="stake" step="0.01" min="0" required>
+    </div>
+
+    <div style="flex:1 1 45%;">
+      <label for="odds">Odds</label>
+      <input type="number" id="odds" name="odds" step="0.01" min="1" required>
+    </div>
+  </div>
+
+  <div style="flex:1 1 100%;">
+    <label for="legs">Legs</label>
+    <input type="number" id="legs" name="legs" min="1" step="1" required>
+  </div>
+
+  <div style="flex:1 1 100%;">
+    <label for="betDate">Date</label>
+    <input type="date" id="betDate" name="betDate" required>
+  </div>
+
+  <div>
+    <label for="sport">Sport</label>
+    <select id="sport" name="sport" required>
+      <option value="">Select...</option>
+      <option value="football">Football</option>
+      <option value="basketball">Basketball</option>
+      <option value="tennis">Tennis</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="result">Result</label>
+    <select id="result" name="result" required>
+      <option value="">Select...</option>
+      <option value="won">Won</option>
+      <option value="lost">Lost</option>
+      <option value="cashout">Cash Out</option>
+    </select>
+  </div>
+
+  <div id="cashOutDiv">
+    <label for="cashOut">Cash Out (€)</label>
+    <input type="number" id="cashOut" name="cashOut" step="0.01" min="0">
+  </div>
+
+  <!-- Νέο πεδίο για φωτογραφία δελτίου -->
+  <div>
+    <label for="betImage">Upload Bet Slip (Photo)</label>
+    <input type="file" id="betImage" accept="image/*">
+    <img id="previewImage" style="display:none;" />
+  </div>
+
+  <button type="submit" class="btn-submit">Save</button>
+</form>
+
+<footer>© 2025 Bet Tracker</footer>
+
+<script>
+let db;
+const request = indexedDB.open("BetTrackerDB", 1);
+request.onupgradeneeded = function(e) {
+  db = e.target.result;
+  if (!db.objectStoreNames.contains("bets")) {
+    const store = db.createObjectStore("bets", { keyPath: "id", autoIncrement: true });
+    store.createIndex("date", "date", { unique: false });
+  }
+};
+request.onsuccess = function(e) { db = e.target.result; };
+request.onerror = function(e) { console.error("IndexedDB error:", e.target.error); };
+
+document.getElementById("backButton").addEventListener("click", ()=>{ window.location.href="index.html"; });
+
+document.getElementById("result").addEventListener("change", function() {
+  document.getElementById("cashOutDiv").style.display = (this.value === "cashout") ? "block" : "none";
+});
+
+// Διαχείριση εικόνας δελτίου
+const betImageInput = document.getElementById("betImage");
+const previewImage = document.getElementById("previewImage");
+let betImageBase64 = null;
+
+betImageInput.addEventListener("change", function(){
+  const file = this.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      betImageBase64 = e.target.result;
+      previewImage.src = betImageBase64;
+      previewImage.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    betImageBase64 = null;
+    previewImage.style.display = "none";
+  }
+});
+
+document.getElementById("betForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const stake = parseFloat(document.getElementById("stake").value);
+  const odds = parseFloat(document.getElementById("odds").value);
+  const legs = parseInt(document.getElementById("legs").value);
+  const sport = document.getElementById("sport").value;
+  const result = document.getElementById("result").value;
+  const cashOut = parseFloat(document.getElementById("cashOut").value) || 0;
+  const date = document.getElementById("betDate").value;
+
+  let earnings = 0;
+  if(result === "won") earnings = (stake * odds) - stake;
+  else if(result === "lost") earnings = -stake;
+  else if(result === "cashout") earnings = cashOut - stake;
+
+  const transaction = db.transaction(["bets"], "readwrite");
+  const store = transaction.objectStore("bets");
+
+  const bet = { 
+    stake, odds, legs, sport, result, 
+    cashOut: (result==="cashout"?cashOut:null), 
+    earnings, date, 
+    image: betImageBase64 // αποθήκευση φωτογραφίας
+  };
+
+  const addRequest = store.add(bet);
+
+  addRequest.onsuccess = function() {
+    const msgBox = document.getElementById("message");
+    msgBox.textContent = "Your bet has been successfully added!";
+    msgBox.className = "success";
+    msgBox.style.display = "block";
+    setTimeout(() => { msgBox.style.display = "none"; }, 3000);
+
+    document.getElementById("betForm").reset();
+    document.getElementById("cashOutDiv").style.display = "none";
+    previewImage.style.display = "none";
+    betImageBase64 = null;
+  };
+
+  addRequest.onerror = function(e){ console.error("Error saving bet:", e.target.error); }
+});
+</script>
+
+</body>
+</html>

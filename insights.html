@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Betting Insights</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+  --primary: #eaeaf0;
+  --secondary: #141629;
+  --background: radial-gradient(circle at top, #141629 0%, #0b0d1a 60%);
+  --card-bg: linear-gradient(160deg, #1b1e3c, #141629);
+
+  --accent: #1dd1a1;
+  --accent-2: #54a0ff;
+  --highlight: #feca57;
+
+  --text: #eaeaf0;
+  --radius: 16px;
+  --shadow: rgba(0,0,0,0.6);
+  --border: rgba(255,255,255,0.08);
+}
+
+/* Base */
+body {
+  margin: 0;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+}
+
+/* Header */
+header {
+  background: linear-gradient(90deg, #0f1228, #1b1e3c);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 18px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+}
+
+header .back-btn {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Navigation */
+.nav-menu {
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent), #10ac84);
+  padding: 0.6rem 0;
+  box-shadow: 0 6px 18px var(--shadow);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+.nav-menu::-webkit-scrollbar { display: none; }
+
+.nav-menu button {
+  background: transparent;
+  border: none;
+  color: #0b0d1a;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.6rem 1.3rem;
+  margin: 0 0.25rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.nav-menu button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.nav-menu button.active {
+  background: var(--highlight);
+  color: #0b0d1a;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+}
+
+/* Filters */
+.filter {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.filter label {
+  margin-right: 0.6rem;
+  font-weight: 700;
+  color: #aab0ff;
+}
+
+.filter select,
+.filter input {
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+}
+
+/* Sections */
+.section {
+  display: none;
+  background: var(--card-bg);
+  margin: 1.2rem;
+  padding: 1.6rem;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px var(--shadow);
+  border: 1px solid var(--border);
+}
+
+h2 {
+  color: var(--highlight);
+  text-align: center;
+  margin-bottom: 1.2rem;
+  font-size: 1.35rem;
+  letter-spacing: 0.5px;
+}
+
+/* Lists */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul li {
+  margin: 0.6rem 0;
+  background: rgba(255,255,255,0.04);
+  padding: 0.7rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.label {
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+/* WLCO */
+.wlco-numbers {
+  margin-left: 20px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Sport buttons */
+#sportButtonsContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
+}
+
+#sportButtonsContainer button {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(84,160,255,0.45);
+  color: var(--text);
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px var(--shadow);
+}
+
+#sportButtonsContainer button:hover {
+  background: var(--accent-2);
+  color: #0b0d1a;
+  transform: translateY(-3px);
+}
+
+#sportButtonsContainer button.active {
+  background: var(--highlight);
+  color: #0b0d1a;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+  header { font-size: 1.25rem; }
+  .nav-menu button {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.9rem;
+  }
+  h2 { font-size: 1.15rem; }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-btn">← Back</a>
+  Betting Insights
+  <span></span>
+</header>
+
+<div class="nav-menu">
+  <button class="active" onclick="showSection('general', this)">General Stats</button>
+  <button onclick="showSection('sports', this)">Sport Analysis</button>
+  <button onclick="showSection('odds', this)">Odds Analysis</button>
+</div>
+
+<!-- General Stats Filter -->
+<div class="filter" id="timeFilterContainer">
+  <label for="timeFilter">Time Range:</label>
+  <select id="timeFilter">
+    <option value="all">All Time</option>
+    <option value="today">Today</option>
+    <option value="lastWeek">Last Week</option>
+    <option value="month">This Month</option>
+    <option value="specificMonth">Specific Month</option>
+  </select>
+  <input type="month" id="monthPicker" style="display:none;">
+</div>
+
+<!-- General Stats -->
+<div id="general" class="section">
+  <h2>General Bet Statistics</h2>
+  <ul>
+    <li><span class="label">Total Bets:</span> <span id="totalBets">-</span></li>
+    <li><span class="label">Win Rate:</span> <span id="successRate">-</span></li>
+    <li><span class="label">Average Stake per Bet:</span> <span id="avgStake">-</span></li>
+    <li><span class="label">Total Earnings:</span> <span id="totalEarnings">-</span></li>
+    <li><span class="label">Total Money Staked:</span> <span id="totalStaked">-</span></li>
+    <li><span class="label">Total Profit:</span> <span id="totalProfit">-</span></li>
+    <li><span class="label">Won - Lost - Cash Out:</span> <span id="wlcoStats">-</span></li>
+    <li><span class="label">Minimum Odds:</span> <span id="minOdds">-</span></li>
+    <li><span class="label">Maximum Odds:</span> <span id="maxOdds">-</span></li>
+  </ul>
+</div>
+
+<!-- Sports Analysis -->
+<div id="sports" class="section">
+  <h2>Sport Analysis</h2>
+  <!-- Time Filter for Sports -->
+  <div class="filter" id="sportTimeFilterContainer">
+    <label for="sportTimeFilter">Time Range:</label>
+    <select id="sportTimeFilter">
+      <option value="all">All Time</option>
+      <option value="today">Today</option>
+      <option value="lastWeek">This Week</option>
+      <option value="month">This Month</option>
+      <option value="specificMonth">Specific Month</option>
+    </select>
+    <input type="month" id="sportMonthPicker" style="display:none;">
+  </div>
+
+  <div id="sportButtonsContainer" class="filter"></div>
+  <div id="sportStatsContainer"></div>
+
+  <h3 style="text-align:center; color: var(--highlight); margin-top:1.5rem;">Win Rate per Sport</h3>
+  <canvas id="sportSuccessChart"></canvas>
+
+  <h3 style="text-align:center; color: var(--highlight); margin-top:1.5rem;">Profit & Loss per Sport</h3>
+  <canvas id="sportProfitChart"></canvas>
+
+  <h3 style="text-align:center; color: var(--highlight); margin-top:1.5rem;">Bet Distribution per Sport</h3>
+  <canvas id="sportStakeDistributionChart"></canvas>
+</div>
+
+<!-- Odds Analysis -->
+<div id="odds" class="section">
+  <h2>Bet Distribution</h2>
+  <canvas id="oddsChart"></canvas>
+  <h3 style="text-align:center; color: var(--highlight); margin-top:1rem;">Win Rate per Odds Range</h3>
+<canvas id="oddsWinRateChart"></canvas>
+<h3 style="text-align:center; color: var(--highlight); margin-top:1rem;">Profit / Loss per Odds Range (€)</h3>
+<canvas id="oddsProfitChart"></canvas>
+<h3 style="text-align:center; color: var(--highlight); margin-top:1rem;">Total Stake per Odds Range (€)</h3>
+<canvas id="oddsStakeChart"></canvas>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+  let oddsProfitChart;
+
+
+
+function showSection(id, btn){
+  document.querySelectorAll('.section').forEach(s => s.style.display='none');
+  document.getElementById(id).style.display='block';
+  document.querySelectorAll('.nav-menu button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('timeFilterContainer').style.display = id==='general' ? 'block' : 'none';
+}
+
+showSection('general', document.querySelector('.nav-menu button.active'));
+
+let db, bets=[];
+
+const request = indexedDB.open("BetTrackerDB",1);
+request.onsuccess = e => { db = e.target.result; loadBets(); }
+request.onerror = e => console.error("IndexedDB error", e);
+
+function loadBets(){
+  const tx = db.transaction("bets","readonly");
+  const store = tx.objectStore("bets");
+  store.getAll().onsuccess = e => {
+    bets = e.target.result;
+    updateStats();
+  }
+}
+
+// --- Filters and Events ---
+const timeFilter = document.getElementById('timeFilter');
+const monthPicker = document.getElementById('monthPicker');
+
+timeFilter.addEventListener('change', () => {
+  monthPicker.style.display = timeFilter.value==='specificMonth' ? 'inline-block' : 'none';
+  updateStats();
+});
+monthPicker.addEventListener('change', updateStats);
+
+// Sport Analysis Filter
+const sportTimeFilter = document.getElementById('sportTimeFilter');
+const sportMonthPicker = document.getElementById('sportMonthPicker');
+
+sportTimeFilter.addEventListener('change', () => {
+  sportMonthPicker.style.display = sportTimeFilter.value==='specificMonth' ? 'inline-block' : 'none';
+  drawSportStats(filterBetsByTime(sportTimeFilter.value));
+});
+
+sportMonthPicker.addEventListener('change', () => {
+  drawSportStats(filterBetsByTime('specificMonth'));
+});
+
+// --- Filter Functions ---
+function filterBets(){
+  const now = new Date();
+  switch(timeFilter.value){
+    case 'today': return bets.filter(b=>new Date(b.date).toDateString()===now.toDateString());
+    case 'lastWeek':
+      const lastWeek = new Date(); lastWeek.setDate(now.getDate()-7);
+      return bets.filter(b=>new Date(b.date)>=lastWeek);
+    case 'month':
+    case 'thisMonth':
+      return bets.filter(b=>{ const d=new Date(b.date); return d.getFullYear()===now.getFullYear() && (d.getMonth()+1)===now.getMonth()+1; });
+    case 'specificMonth':
+      if(!monthPicker.value) return bets;
+      const [y,m] = monthPicker.value.split('-').map(Number);
+      return bets.filter(b=>{ const d=new Date(b.date); return d.getFullYear()===y && (d.getMonth()+1)===m; });
+    default: return bets;
+  }
+}
+
+function filterBetsByTime(range){
+  const now = new Date();
+  switch(range){
+    case 'today': return bets.filter(b=>new Date(b.date).toDateString()===now.toDateString());
+    case 'lastWeek':
+      const lastWeek = new Date(); lastWeek.setDate(now.getDate()-7);
+      return bets.filter(b=>new Date(b.date)>=lastWeek);
+    case 'month':
+    case 'thisMonth':
+      return bets.filter(b=>{ const d=new Date(b.date); return d.getFullYear()===now.getFullYear() && (d.getMonth()+1)===now.getMonth()+1; });
+    case 'specificMonth':
+      if(!sportMonthPicker.value) return bets;
+      const [y,m] = sportMonthPicker.value.split('-').map(Number);
+      return bets.filter(b=>{ const d=new Date(b.date); return d.getFullYear()===y && (d.getMonth()+1)===m; });
+    default: return bets;
+  }
+}
+
+// --- Update Stats ---
+function updateStats(){
+  const filteredBets = filterBets();
+  fillGeneralStats(filteredBets);
+  drawSportStats(filterBetsByTime(sportTimeFilter.value));
+  drawOddsChart(filteredBets);
+  drawOddsWinRateChart(filteredBets);
+  drawOddsProfitChart(filteredBets);
+  drawOddsStakeChart(filteredBets);
+
+}
+
+// --- General Stats ---
+function fillGeneralStats(filteredBets){
+  const relevantBets = filteredBets.filter(b => b.result==='won'||b.result==='lost'||b.result==='cashout');
+  const totalBets = relevantBets.length;
+  const wonBets = relevantBets.filter(b=>b.result==='won').length;
+  const lostBets = relevantBets.filter(b=>b.result==='lost').length;
+  const cashoutBets = relevantBets.filter(b=>b.result==='cashout').length;
+
+  const totalStake = filteredBets.reduce((s,b)=>s+b.stake,0);
+  const totalEarnings = filteredBets.filter(b=>b.result==='won').reduce((s,b)=>s+b.stake*b.odds,0);
+  const totalProfit = totalEarnings-totalStake;
+  const avgStake = totalBets?totalStake/totalBets:0;
+  const successRate = totalBets?(wonBets/(totalBets-cashoutBets)*100):0;
+
+  document.getElementById('totalBets').textContent = filteredBets.length;
+  document.getElementById('successRate').textContent = successRate.toFixed(2)+'%';
+  document.getElementById('avgStake').textContent = avgStake.toFixed(2)+' €';
+  document.getElementById('totalStaked').textContent = totalStake.toFixed(2)+' €';
+  document.getElementById('totalEarnings').textContent = totalEarnings.toFixed(2)+' €';
+
+  const profitElement = document.getElementById('totalProfit');
+  profitElement.textContent = totalProfit.toFixed(2)+' €';
+  profitElement.style.color = totalProfit>0?'limegreen':totalProfit<0?'red':'#fff';
+
+  document.getElementById('wlcoStats').textContent = `${wonBets} - ${lostBets} - ${cashoutBets}`;
+
+  // Minimum / Maximum Odds
+  const oddsList = filteredBets.map(b=>b.odds);
+  document.getElementById('minOdds').textContent = oddsList.length?Math.min(...oddsList).toFixed(2):'-';
+  document.getElementById('maxOdds').textContent = oddsList.length?Math.max(...oddsList).toFixed(2):'-';
+}
+
+// --- Sport Analysis ---
+let sportSuccessChart, sportProfitChart, sportStakeDistributionChart;
+
+function drawSportStats(filteredBets){
+  const sportStats = {};
+  filteredBets.forEach(b => {
+    if(!sportStats[b.sport]) sportStats[b.sport] = {bets:0,wins:0,earnings:0,stake:0,cashout:0};
+    sportStats[b.sport].bets += 1;
+    sportStats[b.sport].stake += b.stake;
+    if(b.result === 'won'){ sportStats[b.sport].wins += 1; sportStats[b.sport].earnings += b.stake*b.odds; }
+    if(b.result === 'cashout') sportStats[b.sport].cashout += 1;
+  });
+
+  const sportButtonsContainer = document.getElementById('sportButtonsContainer');
+  const container = document.getElementById('sportStatsContainer');
+  const successChartCanvas = document.getElementById('sportSuccessChart');
+  const profitChartCanvas = document.getElementById('sportProfitChart');
+  const stakeChartCanvas = document.getElementById('sportStakeDistributionChart');
+
+  // Καθαρίζουμε προηγούμενα στοιχεία
+  sportButtonsContainer.innerHTML = '';
+  container.innerHTML = '';
+
+  const sports = Object.keys(sportStats);
+
+  if(sports.length === 0){
+    // Αν δεν υπάρχουν στοιχήματα στο φίλτρο
+    container.innerHTML = '<p style="text-align:center; color:#ffa500; font-weight:bold;">No bets for this time period.</p>';
+    // Κρύβουμε τα γραφήματα
+    successChartCanvas.style.display = 'none';
+    profitChartCanvas.style.display = 'none';
+    stakeChartCanvas.style.display = 'none';
+    return;
+  }
+
+  // Εμφανίζουμε τα γραφήματα
+  successChartCanvas.style.display = 'block';
+  profitChartCanvas.style.display = 'block';
+  stakeChartCanvas.style.display = 'block';
+
+  // Δημιουργία κουμπιών για αθλήματα
+  sports.sort().forEach(sport => {
+    const btn = document.createElement('button');
+    btn.textContent = sport.charAt(0).toUpperCase() + sport.slice(1);
+    btn.onclick = () => updateSportStats(sport, filteredBets);
+    sportButtonsContainer.appendChild(btn);
+  });
+
+  // Εμφάνιση στατιστικών για το πρώτο άθλημα
+  updateSportStats(sports[0], filteredBets);
+
+  drawSportSuccessChart(sportStats);
+  drawSportProfitChart(sportStats);
+  drawSportStakeDistributionChart(sportStats);
+}
+
+function updateSportStats(selectedSport,filteredBets){
+  const container=document.getElementById('sportStatsContainer');
+  container.innerHTML='';
+
+  const filteredBetsBySport=filteredBets.filter(b=>b.sport===selectedSport);
+  if(filteredBetsBySport.length===0){
+    container.innerHTML='<p>No data available for this sport.</p>';
+    return;
+  }
+
+  const stats=filteredBetsBySport.reduce((acc,b)=>{
+    acc.bets+=1; acc.stake+=b.stake;
+    if(b.result==='won'){ acc.wins+=1; acc.earnings+=b.stake*b.odds; }
+    else if(b.result==='lost'){ acc.lost+=1; }
+    else if(b.result==='cashout'){ acc.cashout+=1; }
+    return acc;
+  },{bets:0,wins:0,lost:0,cashout:0,earnings:0,stake:0});
+
+  const successRate=stats.bets?(stats.wins/(stats.bets-stats.cashout)*100).toFixed(2):0;
+  const avgStake=stats.bets?(stats.stake/stats.bets).toFixed(2):0;
+  const profit=(stats.earnings-stats.stake).toFixed(2);
+
+  const ul=document.createElement('ul');
+  ul.innerHTML=`
+    <li><span class="label">Total Bets:</span> ${filteredBetsBySport.length}</li>
+    <li><span class="label">Win Rate:</span> ${successRate}%</li>
+    <li><span class="label">Average Stake per Bet:</span> ${avgStake} €</li>
+    <li><span class="label">Total Earnings:</span> ${stats.earnings.toFixed(2)} €</li>
+    <li><span class="label">Total Money Staked:</span> ${stats.stake.toFixed(2)} €</li>
+    <li><span class="label">Total Profit:</span> <span style="color:${profit>0?'limegreen':profit<0?'red':'#fff'}">${profit} €</span></li>
+    <li><span class="label">Won - Lost - Cash Out:</span> <span class="wlco-numbers">${stats.wins} - ${stats.lost} - ${stats.cashout}</span></li>
+  `;
+  container.appendChild(ul);
+
+  document.querySelectorAll('#sportButtonsContainer button').forEach(b=>{
+    b.classList.remove('active');
+    if(b.textContent.toLowerCase()===selectedSport.toLowerCase()) b.classList.add('active');
+  });
+}
+
+// --- Odds Chart ---
+let oddsChart;
+function drawOddsChart(filteredBets){
+  const ranges = {'1.01-2':0,'2-3':0,'>3':0};
+  filteredBets.forEach(b=>{
+    if(b.odds >= 1.01 && b.odds < 2) ranges['1.01-2']++;
+    else if(b.odds >= 2 && b.odds <= 3) ranges['2-3']++;
+    else if(b.odds > 3) ranges['>3']++;
+  });
+
+  const ctx = document.getElementById('oddsChart').getContext('2d');
+  const dataValues = Object.values(ranges);
+  const labels = Object.keys(ranges);
+  const colors = ['rgba(76,175,80,0.8)','rgba(33,150,243,0.8)','rgba(244,67,54,0.8)'];
+
+  if(!oddsChart){
+    oddsChart = new Chart(ctx,{
+      type:'pie',
+      data:{labels:labels,datasets:[{data:dataValues,backgroundColor:colors,borderColor:'#1b1b2f',borderWidth:2}]},
+      options:{
+        responsive:true,
+        animation:{animateRotate:true,animateScale:true,duration:1000,easing:'easeOutQuart'},
+        plugins:{
+          legend:{position:'bottom',labels:{color:'#fff',font:{size:14,weight:'bold'}}},
+          tooltip:{
+            callbacks:{
+              label:function(context){
+                const total = dataValues.reduce((a,b)=>a+b,0);
+                const pct = total ? (context.raw/total*100).toFixed(1) : 0;
+                return `${context.label}: ${context.raw} bets (${pct}%)`;
+              }
+            }
+          },
+          datalabels:{
+            color:'#fff',
+            font:{weight:'bold',size:14},
+            formatter:function(value){
+              const total = dataValues.reduce((a,b)=>a+b,0);
+              return total ? ((value/total)*100).toFixed(1)+'%' : '0%';
+            }
+          }
+        }
+      },
+      plugins:[ChartDataLabels]
+    });
+  } else {
+    oddsChart.data.datasets[0].data = dataValues;
+    oddsChart.update({duration:800,easing:'easeOutQuart'});
+  }
+
+  // --- Υπολογισμός και εμφάνιση Stake-weighted Odds ---
+
+
+  const stakeContainer = document.getElementById('stakeWeightedOdds');
+  if(stakeContainer) stakeContainer.textContent = stakeWeighted;
+}
+
+let oddsWinRateChart;
+
+function drawOddsWinRateChart(filteredBets){
+  const ranges = {'1.01-2':[], '2-3':[], '>3':[]};
+  
+  filteredBets.forEach(b=>{
+    if(b.odds >= 1.01 && b.odds < 2) ranges['1.01-2'].push(b);
+    else if(b.odds >= 2 && b.odds <= 3) ranges['2-3'].push(b);
+    else if(b.odds > 3) ranges['>3'].push(b);
+  });
+
+  const labels = Object.keys(ranges);
+  const data = labels.map(range => {
+    const betsInRange = ranges[range];
+    const wins = betsInRange.filter(b => b.result==='won').length;
+    const total = betsInRange.length;
+    return total ? (wins/total*100).toFixed(2) : 0;
+  });
+
+  const ctx = document.getElementById('oddsWinRateChart').getContext('2d');
+
+  if(oddsWinRateChart) oddsWinRateChart.destroy();
+
+  oddsWinRateChart = new Chart(ctx,{
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Win Rate (%)',
+        data: data,
+        backgroundColor: data.map(p => p>=70?'rgba(76,175,80,0.8)':p>=40?'rgba(255,193,7,0.8)':'rgba(244,67,54,0.8)'),
+        borderColor:'#fff',
+        borderWidth:1,
+        borderRadius:6
+      }]
+    },
+    options: {
+      responsive:true,
+      plugins: {
+        legend:{display:false},
+        datalabels:{
+          color:'#fff',
+          anchor:'end',
+          align:'start',
+          font:{weight:'bold',size:14},
+          formatter: v => v+'%'
+        }
+      },
+      scales: {
+        y:{
+          beginAtZero:true,
+          max:100,
+          title:{display:true,text:'Win Rate (%)',color:'#ffa500',font:{weight:'bold'}},
+          ticks:{color:'#fff'},
+          grid:{color:'rgba(255,255,255,0.1)'}
+        },
+        x:{
+          ticks:{color:'#fff'},
+          grid:{display:false}
+        }
+      },
+    },
+    plugins:[ChartDataLabels]
+  });
+}
+
+
+// --- Charts for Sports ---
+function drawSportSuccessChart(sportStats){
+  const ctx=document.getElementById('sportSuccessChart').getContext('2d');
+  const labels=Object.keys(sportStats);
+  const data=labels.map(s=>{
+    const stats=sportStats[s];
+    const effectiveBets=stats.bets-(stats.cashout||0);
+    return effectiveBets>0?(stats.wins/effectiveBets*100).toFixed(2):0;
+  });
+  const bgColors=data.map(pct=>pct>=70?'rgba(76,175,80,0.8)':pct>=40?'rgba(255,193,7,0.8)':'rgba(244,67,54,0.8)');
+  if(sportSuccessChart) sportSuccessChart.destroy();
+  sportSuccessChart=new Chart(ctx,{type:'bar',data:{labels:labels.map(s=>s.charAt(0).toUpperCase()+s.slice(1)),datasets:[{label:'Win Rate (%)',data:data,backgroundColor:bgColors,borderRadius:6,borderWidth:1,borderColor:'#fff'}]},options:{responsive:true,plugins:{legend:{display:false},datalabels:{color:'#fff',anchor:'end',align:'start',font:{weight:'bold',size:12},formatter:v=>v+'%'}},scales:{y:{beginAtZero:true,max:100,title:{display:true,text:'Win Rate (%)',color:'#ffa500',font:{weight:'bold'}},ticks:{color:'#fff'},grid:{color:'rgba(255,255,255,0.1)'}},x:{ticks:{color:'#fff'},grid:{display:false}}}},plugins:[ChartDataLabels]});
+}
+
+function drawSportProfitChart(sportStats){
+  const ctx=document.getElementById('sportProfitChart').getContext('2d');
+  const labels=Object.keys(sportStats);
+  const data=labels.map(s=>sportStats[s].earnings-sportStats[s].stake);
+  const bgColors=data.map(p=>p>=0?'rgba(76,175,80,0.8)':'rgba(244,67,54,0.8)');
+  if(sportProfitChart) sportProfitChart.destroy();
+  sportProfitChart=new Chart(ctx,{type:'bar',data:{labels:labels.map(s=>s.charAt(0).toUpperCase()+s.slice(1)),datasets:[{label:'Profit / Loss (€)',data:data,backgroundColor:bgColors,borderRadius:6,borderWidth:1,borderColor:'#fff'}]},options:{responsive:true,plugins:{legend:{display:false},datalabels:{color:'#fff',font:{weight:'bold',size:12},anchor:'center',align:'center',formatter:v=>v+' €'}}},scales:{y:{beginAtZero:true,ticks:{color:'#fff'},grid:{color:'rgba(255,255,255,0.1)'}},x:{ticks:{color:'#fff'},grid:{display:false}}},plugins:[ChartDataLabels]});
+}
+
+function drawSportStakeDistributionChart(sportStats){
+  const ctx=document.getElementById('sportStakeDistributionChart').getContext('2d');
+  const labels=Object.keys(sportStats);
+  const data=labels.map(s=>sportStats[s].stake);
+  const bgColors=['rgba(76,175,80,0.8)','rgba(244,67,54,0.8)','rgba(255,193,7,0.8)','rgba(33,150,243,0.8)','rgba(156,39,176,0.8)','rgba(0,188,212,0.8)','rgba(255,87,34,0.8)'];
+  if(sportStakeDistributionChart) sportStakeDistributionChart.destroy();
+  sportStakeDistributionChart=new Chart(ctx,{type:'pie',data:{labels:labels.map(s=>s.charAt(0).toUpperCase()+s.slice(1)),datasets:[{data:data,backgroundColor:bgColors.slice(0,labels.length),borderColor:'#1b1b2f',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#fff',font:{size:12,weight:'bold'}}},tooltip:{callbacks:{label:function(context){const total=data.reduce((a,b)=>a+b,0);const pct=total>0?(context.raw/total*100).toFixed(2):0;return `${context.label}: ${context.raw} € (${pct}%)`;}}},datalabels:{color:'#fff',font:{weight:'bold',size:16},formatter:function(value){const total=data.reduce((a,b)=>a+b,0);return total>0?((value/total)*100).toFixed(1)+'%':'0%';}}}},plugins:[ChartDataLabels]});
+}
+function drawOddsProfitChart(filteredBets){
+  const ranges = {'1.01-2':0, '2-3':0, '>3':0};
+
+  filteredBets.forEach(b=>{
+    const profit = (b.result==='won'? b.stake*b.odds : (b.result==='lost'? 0 : b.stake)) - b.stake;
+    if(b.odds >= 1.01 && b.odds < 2) ranges['1.01-2'] += profit;
+    else if(b.odds >= 2 && b.odds <= 3) ranges['2-3'] += profit;
+    else if(b.odds > 3) ranges['>3'] += profit;
+  });
+
+  const labels = Object.keys(ranges);
+  const data = Object.values(ranges);
+
+  const ctx = document.getElementById('oddsProfitChart').getContext('2d');
+
+  if(oddsProfitChart) oddsProfitChart.destroy();
+
+  oddsProfitChart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels: labels,
+      datasets:[{
+        label:'Profit / Loss (€)',
+        data:data,
+        backgroundColor:data.map(v=>v>=0?'rgba(76,175,80,0.8)':'rgba(244,67,54,0.8)'),
+        borderColor:'#fff',
+        borderWidth:1,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          color:'#fff',
+          anchor:'end',
+          align:'start',
+          font:{weight:'bold',size:14},
+          formatter: v => v.toFixed(2)+' €'
+        }
+      },
+      scales:{
+        y:{
+          beginAtZero:false,
+          ticks:{color:'#fff'},
+          grid:{color:'rgba(255,255,255,0.1)'}
+        },
+        x:{
+          ticks:{color:'#fff'},
+          grid:{display:false}
+        }
+      }
+    },
+    plugins:[ChartDataLabels]
+  });
+}
+
+  function drawOddsWinRateChart(filteredBets){
+  const ranges = {'1.01-2':[], '2-3':[], '>3':[]};
+  
+  filteredBets.forEach(b=>{
+    if(b.odds >= 1.01 && b.odds < 2) ranges['1.01-2'].push(b);
+    else if(b.odds >= 2 && b.odds <= 3) ranges['2-3'].push(b);
+    else if(b.odds > 3) ranges['>3'].push(b);
+  });
+
+  const labels = Object.keys(ranges);
+  const data = labels.map(range => {
+    const betsInRange = ranges[range];
+    const wins = betsInRange.filter(b => b.result==='won').length;
+    const total = betsInRange.length;
+    return total ? (wins/total*100).toFixed(2) : 0;
+  });
+
+  const ctx = document.getElementById('oddsWinRateChart').getContext('2d');
+
+ 
+
+  window.oddsWinRateChart = new Chart(ctx,{
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Win Rate (%)',
+        data: data,
+        backgroundColor: data.map(p => p>=70?'rgba(76,175,80,0.8)':p>=40?'rgba(255,193,7,0.8)':'rgba(244,67,54,0.8)'),
+        borderColor:'#fff',
+        borderWidth:1,
+        borderRadius:6
+      }]
+    },
+    options: {
+      responsive:true,
+      plugins: {
+        legend:{display:false},
+        datalabels:{
+          color:'#fff',
+          anchor:'end',
+          align:'start',
+          font:{weight:'bold',size:14},
+          formatter: v => v+'%'
+        }
+      },
+      scales: {
+        y:{
+          beginAtZero:true,
+          max:100,
+          title:{display:true,text:'Win Rate (%)',color:'#ffa500',font:{weight:'bold'}},
+          ticks:{color:'#fff'},
+          grid:{color:'rgba(255,255,255,0.1)'}
+        },
+        x:{
+          ticks:{color:'#fff'},
+          grid:{display:false}
+        }
+      },
+    },
+    plugins:[ChartDataLabels]
+  });
+}
+let oddsStakeChart;
+
+function drawOddsStakeChart(filteredBets){
+  const ranges = {'1.01-2':0, '2-3':0, '>3':0};
+
+  filteredBets.forEach(b=>{
+    if(b.odds >= 1.01 && b.odds < 2) ranges['1.01-2'] += b.stake;
+    else if(b.odds >= 2 && b.odds <= 3) ranges['2-3'] += b.stake;
+    else if(b.odds > 3) ranges['>3'] += b.stake;
+  });
+
+  const labels = Object.keys(ranges);
+  const data = Object.values(ranges);
+
+  const ctx = document.getElementById('oddsStakeChart').getContext('2d');
+
+  if(oddsStakeChart) oddsStakeChart.destroy();
+
+  oddsStakeChart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels: labels,
+      datasets:[{
+        label:'Total Stake (€)',
+        data:data,
+        backgroundColor:['rgba(33,150,243,0.8)','rgba(255,193,7,0.8)','rgba(244,67,54,0.8)'],
+        borderColor:'#fff',
+        borderWidth:1,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          color:'#fff',
+          anchor:'end',
+          align:'start',
+          font:{weight:'bold',size:14},
+          formatter: v => v.toFixed(2)+' €'
+        }
+      },
+      scales:{
+        y:{
+          beginAtZero:true,
+          ticks:{color:'#fff'},
+          grid:{color:'rgba(255,255,255,0.1)'}
+        },
+        x:{
+          ticks:{color:'#fff'},
+          grid:{display:false}
+        }
+      }
+    },
+    plugins:[ChartDataLabels]
+  });
+}
+
+</script>
+</body>
+</html>

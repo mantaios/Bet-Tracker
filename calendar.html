@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Calendar Earnings - Bet Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+  --primary: #eaeaf0;
+  --secondary: #141629;
+  --background: radial-gradient(circle at top, #141629 0%, #0b0d1a 65%);
+  --accent: #1dd1a1;
+  --accent-2: #54a0ff;
+  --highlight: #feca57;
+  --card-bg: linear-gradient(160deg, #1b1e3c, #141629);
+  --radius: 14px;
+  --shadow: rgba(0,0,0,0.6);
+  --border: rgba(255,255,255,0.08);
+  --success: linear-gradient(135deg, #2ecc71, #27ae60);
+  --danger: linear-gradient(135deg, #ff6b6b, #ee5253);
+  --neutral: linear-gradient(135deg, #2f335e, #1b1e3c);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Inter","Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: var(--primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.2rem;
+}
+
+header {
+  width: 100%;
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  text-shadow: 0 0 18px rgba(29,209,161,0.35);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+select, button {
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.35);
+  color: var(--primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 6px 16px var(--shadow);
+  transition: all 0.25s ease;
+}
+
+select:hover, button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.calendar-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 820px;
+  height: calc(100vh - 260px);
+}
+
+.day {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 20px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.3rem;
+  font-size: 0.85rem;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.day:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px var(--shadow);
+}
+
+.day-header {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  color: var(--highlight);
+}
+
+.earnings {
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.day.positive {
+  background: var(--success);
+  color: #0b0d1a;
+}
+
+.day.negative {
+  background: var(--danger);
+  color: #0b0d1a;
+}
+
+.day.neutral {
+  background: var(--neutral);
+}
+
+footer {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #8b8fae;
+}
+
+#backButton {
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius);
+  border: none;
+  background: linear-gradient(135deg, var(--accent), #10ac84);
+  color: #0b0d1a;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px var(--shadow);
+  transition: all 0.25s ease;
+}
+
+#backButton:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+#monthSummary {
+  width: 100%;
+  max-width: 820px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: right;
+  margin-bottom: 0.6rem;
+  color: var(--highlight);
+}
+
+@media (max-width: 500px) {
+  .calendar-container {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    height: auto;
+  }
+}
+</style>
+
+</head>
+<body>
+
+<header>Calendar Earnings</header>
+
+<div class="controls">
+  <button id="backButton">← Back</button>
+  <select id="monthSelect"></select>
+  <select id="yearSelect"></select>
+</div>
+<div id="monthSummary"></div>
+
+<div class="calendar-container" id="calendarContainer"></div>
+
+<footer>© 2025 Bet Tracker</footer>
+
+<script>
+// Back button
+document.getElementById("backButton").addEventListener("click", ()=>{ window.location.href = "index.html"; });
+
+let db;
+const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const today = new Date();
+let currentMonth = today.getMonth();
+let currentYear = today.getFullYear();
+
+const request = indexedDB.open("BetTrackerDB", 1);
+request.onsuccess = e => { db = e.target.result; initCalendar(); };
+request.onerror = e => console.error("IndexedDB error:", e.target.error);
+
+function initCalendar(){
+  const monthSelect = document.getElementById("monthSelect");
+  const yearSelect = document.getElementById("yearSelect");
+
+  monthNames.forEach((name, idx) => {
+    const option = document.createElement("option");
+    option.value = idx;
+    option.textContent = name;
+    if(idx === currentMonth) option.selected = true;
+    monthSelect.appendChild(option);
+  });
+
+  for(let y=currentYear+1; y>=currentYear-5; y--){
+    const option = document.createElement("option");
+    option.value = y;
+    option.textContent = y;
+    if(y===currentYear) option.selected=true;
+    yearSelect.appendChild(option);
+  }
+
+  monthSelect.addEventListener("change", renderMonth);
+  yearSelect.addEventListener("change", renderMonth);
+
+  renderMonth();
+}
+
+function renderMonth(){
+  const container = document.getElementById("calendarContainer");
+  const summaryDiv = document.getElementById("monthSummary");
+  container.innerHTML = "";
+  summaryDiv.innerHTML = "";
+
+  const month = parseInt(document.getElementById("monthSelect").value);
+  const year = parseInt(document.getElementById("yearSelect").value);
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const lastDate = new Date(year, month+1, 0).getDate();
+
+  const transaction = db.transaction(["bets"], "readonly");
+  const store = transaction.objectStore("bets");
+  const getAllRequest = store.getAll();
+
+  getAllRequest.onsuccess = function(){
+    const bets = getAllRequest.result;
+    const earningsByDate = {};
+    let totalEarnings = 0;
+
+    bets.forEach(bet=>{
+      if(!earningsByDate[bet.date]) earningsByDate[bet.date] = 0;
+      earningsByDate[bet.date] += bet.earnings;
+    });
+
+    for(let i=0;i<firstDay;i++){
+      const emptyCell = document.createElement("div");
+      container.appendChild(emptyCell);
+    }
+
+    for(let day=1;day<=lastDate;day++){
+      const dayCell = document.createElement("div");
+      dayCell.className = "day";
+
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const earnings = earningsByDate[dateStr] || 0;
+      totalEarnings += earnings;
+
+      dayCell.innerHTML = `<div class="day-header">${day}</div><div class="earnings">€${earnings.toFixed(2)}</div>`;
+
+      if(earnings>0) dayCell.style.background = "var(--success)";
+      else if(earnings<0) dayCell.style.background = "var(--danger)";
+      else dayCell.style.background = "var(--neutral)";
+
+      container.appendChild(dayCell);
+    }
+
+    let color = totalEarnings>0?"var(--success)":totalEarnings<0?"var(--danger)":"var(--neutral)";
+    summaryDiv.innerHTML = `Total: <span style="color:${color}">€${totalEarnings.toFixed(2)}</span>`;
+  };
+}
+</script>
+
+</body>
+</html>

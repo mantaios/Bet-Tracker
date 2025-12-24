@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bet History - Mobile Friendly</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+  --primary: #eaeaf0;
+  --secondary: #141629;
+  --background: radial-gradient(circle at top, #141629 0%, #0b0d1a 60%);
+  --accent: #1dd1a1;
+  --accent-2: #54a0ff;
+  --highlight: #feca57;
+  --success: #1dd1a1;
+  --danger: #ff6b6b;
+  --cashout: #54a0ff;
+
+  --card-bg: linear-gradient(160deg, #1b1e3c, #141629);
+  --radius: 16px;
+  --shadow: rgba(0,0,0,0.6);
+  --border: rgba(255,255,255,0.08);
+}
+
+/* Base */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: var(--primary);
+  min-height: 100vh;
+  padding: 1.5rem 1rem;
+}
+
+/* Header */
+header {
+  width: 100%;
+  background: linear-gradient(90deg, #0f1228, #1b1e3c);
+  text-align: center;
+  padding: 1.2rem;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Buttons */
+.back-btn,
+.help-btn,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.3rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  background: linear-gradient(135deg, var(--accent), #10ac84);
+  color: #0b0d1a;
+  box-shadow: 0 6px 18px var(--shadow);
+  transition: all 0.25s ease;
+}
+
+.back-btn:hover,
+.help-btn:hover,
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px var(--shadow);
+  filter: brightness(1.08);
+}
+
+.btn.danger {
+  background: linear-gradient(135deg, var(--danger), #ff4757);
+  color: #fff;
+}
+
+/* Filters */
+#filters {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+#filters label {
+  color: #aab0ff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+#filters input,
+#filters select {
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--primary);
+}
+
+/* Bet Card */
+.bet-card-wrapper {
+  margin-bottom: 1.8rem;
+  position: relative;
+}
+
+.color-bar {
+  height: 70px;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.bet-card {
+  background: var(--card-bg);
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 10px 30px var(--shadow);
+  padding: 1.4rem;
+  border: 1px solid var(--border);
+}
+
+/* Info grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.info-box {
+  background: rgba(255,255,255,0.04);
+  padding: 0.9rem;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.45);
+}
+
+.info-box .label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.5px;
+}
+
+.info-box .value {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+/* Earnings colors */
+.earnings.positive { color: var(--success); }
+.earnings.negative { color: var(--danger); }
+.earnings.cashout  { color: var(--cashout); }
+
+/* Delete */
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--danger), #ff4757);
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  transform: scale(1.15);
+  filter: brightness(1.1);
+}
+
+/* Modal */
+.modal {
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  transition: opacity 0.3s ease;
+}
+
+.modal.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  padding: 2rem 1.6rem;
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px var(--shadow);
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  border: 1px solid var(--border);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.modal.open .modal-content {
+  transform: scale(1);
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+/* Info Paper */
+.info-paper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: var(--card-bg);
+  color: var(--primary);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px var(--shadow);
+  max-width: 420px;
+  width: 90%;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.info-paper.open {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.info-paper h2 {
+  margin-top: 0;
+  color: var(--highlight);
+}
+
+.info-paper li {
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Footer */
+footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8b8fae;
+}
+</style>
+
+
+
+</head>
+<body>
+
+<header>Bet History</header>
+
+<div class="top-bar">
+  <a href="index.html" class="back-btn">← Back</a>
+  <button id="helpBtn" class="help-btn">Help</button>
+</div>
+
+<!-- Filters -->
+<div id="filters">
+  <div>
+    <label for="filterDate">Date</label>
+    <input type="date" id="filterDate">
+  </div>
+  <div>
+    <label for="filterResult">Result</label>
+    <select id="filterResult">
+      <option value="">All</option>
+      <option value="won">Won</option>
+      <option value="lost">Lost</option>
+      <option value="cashout">Cash Out</option>
+    </select>
+  </div>
+  <div>
+    <label for="filterSport">Sport</label>
+    <select id="filterSport">
+      <option value="">All</option>
+      <option value="football">Football</option>
+      <option value="basketball">Basketball</option>
+      <option value="tennis">Tennis</option>
+      <option value="other">Other</option>
+    </select>
+  </div>
+</div>
+
+<div id="historyContainer">
+  <!-- Bet cards -->
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <p>Remove this Bet from your History?</p>
+    <div class="modal-actions">
+      <button id="confirmDelete" class="btn danger">Delete</button>
+      <button id="cancelDelete" class="btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Info Paper -->
+<div id="infoPaper" class="info-paper">
+  <div class="info-content">
+    <h2>Help & Instructions</h2>
+    <p>This page allows you to track your bets and manage them easily. Here's a detailed guide:</p>
+    <ul>
+      <li><strong>Filters:</strong> Use the date, result, and sport filters to narrow down your bet history.</li>
+      <li><strong>Bet Cards:</strong> Each card shows:
+        <ul>
+          <li><strong>Stake:</strong> The amount placed on the bet.</li>
+          <li><strong>Odds:</strong> The odds for the bet.</li>
+          <li><strong>Legs:</strong> Number of selections in the bet.</li>
+          <li><strong>Earnings:</strong> Won/lost amount. Green: positive, Red: negative, Blue: cash out.</li>
+         
+        </ul>
+      </li>
+      <li><strong>Delete Bet:</strong> Click × to remove a bet. A confirmation will appear.</li>
+      <li><strong>Help:</strong> Click this button to view instructions anytime.</li>
+      <li><strong>Back:</strong> Return to the main page.</li>
+     
+    </ul>
+    <button id="closeInfo" class="btn">Close</button>
+  </div>
+</div>
+
+<footer>© 2025 Bet Tracker</footer>
+
+<script>
+let db;
+const request = indexedDB.open("BetTrackerDB", 1);
+
+request.onsuccess = function(e) {
+  db = e.target.result;
+  loadHistory();
+};
+request.onerror = function(e) { console.error("IndexedDB error:", e.target.error); };
+
+const sportStyles = {
+  "football": { image: "url('images/football.jpg')" },
+  "basketball": { image: "url('images/basketball.jpg')" },
+  "tennis": { image: "url('images/tennis.jpg')" },
+  "other": { image: "url('images/default.jpg')" }
+};
+
+function loadHistory() {
+  const transaction = db.transaction(["bets"], "readonly");
+  const store = transaction.objectStore("bets");
+  const getAllRequest = store.getAll();
+
+  getAllRequest.onsuccess = function() {
+    const bets = getAllRequest.result;
+    renderBets(bets);
+  };
+}
+
+function renderBets(bets) {
+  const container = document.getElementById("historyContainer");
+  container.innerHTML = "";
+
+  const filterDate = document.getElementById("filterDate").value;
+  const filterResult = document.getElementById("filterResult").value;
+  const filterSport = document.getElementById("filterSport").value;
+
+  const filtered = bets.filter(bet => {
+    const matchDate = !filterDate || bet.date === filterDate;
+    const matchResult = !filterResult || bet.result === filterResult;
+    const matchSport = !filterSport || bet.sport === filterSport;
+    return matchDate && matchResult && matchSport;
+  });
+
+  filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  filtered.forEach(bet => {
+    const sport = sportStyles[bet.sport?.toLowerCase()] || sportStyles["other"];
+    const wrapper = document.createElement("div");
+    wrapper.className = "bet-card-wrapper";
+
+    const topBar = document.createElement("div");
+    topBar.className = "color-bar";
+    topBar.style.backgroundImage = sport.image;
+    wrapper.appendChild(topBar);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "×";
+    deleteBtn.addEventListener("click", () => openDeleteModal(bet.id));
+    wrapper.appendChild(deleteBtn);
+
+    const card = document.createElement("div");
+    card.className = "bet-card";
+
+    let earningsClass = bet.earnings >= 0 ? "positive" : "negative";
+    if(bet.result === "cashout") earningsClass = "cashout";
+
+    let cashOutHtml = "";
+    if(bet.cashOut !== null && !isNaN(bet.cashOut)) {
+      cashOutHtml = `
+        <div class="info-box">
+          <span class="label">Cash Out</span>
+          <span class="value">€${bet.cashOut.toFixed(2)}</span>
+        </div>`;
+    }
+
+    card.innerHTML = `
+      <div class="info-grid">
+        <div class="info-box">
+          <span class="label">Stake</span>
+          <span class="value">€${bet.stake.toFixed(2)}</span>
+        </div>
+        <div class="info-box">
+          <span class="label">Odds</span>
+          <span class="value">${bet.odds.toFixed(2)}</span>
+        </div>
+        <div class="info-box">
+          <span class="label">Legs</span>
+          <span class="value">${bet.legs}</span>
+        </div>
+        <div class="info-box">
+          <span class="label">Earnings</span>
+          <span class="value earnings ${earningsClass}">€${bet.earnings.toFixed(2)}</span>
+        </div>
+      
+      </div>
+    `;
+
+    wrapper.appendChild(card);
+    container.appendChild(wrapper);
+  });
+}
+
+document.getElementById("filterDate").addEventListener("change", loadHistory);
+document.getElementById("filterResult").addEventListener("change", loadHistory);
+document.getElementById("filterSport").addEventListener("change", loadHistory);
+
+let deleteId = null;
+function openDeleteModal(id) {
+  deleteId = id;
+  document.getElementById("deleteModal").classList.add("open");
+}
+document.getElementById("cancelDelete").addEventListener("click", () => {
+  document.getElementById("deleteModal").classList.remove("open");
+  deleteId = null;
+});
+document.getElementById("confirmDelete").addEventListener("click", () => {
+  if(deleteId !== null){
+    const transaction = db.transaction(["bets"], "readwrite");
+    const store = transaction.objectStore("bets");
+    const request = store.delete(deleteId);
+    request.onsuccess = function() {
+      document.getElementById("deleteModal").classList.remove("open");
+      deleteId = null;
+      loadHistory();
+    };
+  }
+});
+
+// Help Paper JS
+const helpBtn = document.getElementById("helpBtn");
+const infoPaper = document.getElementById("infoPaper");
+const closeInfo = document.getElementById("closeInfo");
+
+helpBtn.addEventListener("click", () => infoPaper.classList.add("open"));
+closeInfo.addEventListener("click", () => infoPaper.classList.remove("open"));
+infoPaper.addEventListener("click", e => { if(e.target === infoPaper) infoPaper.classList.remove("open"); });
+
+</script>
+</body>
+</html>
